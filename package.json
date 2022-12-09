@@ -16,10 +16,8 @@
   "license": "MIT",
 
   "type": "module",
-  "// main": "backward compatibility",
-  "main": "./dist/iterator-helpers.js",
   "exports": {
-    ".": "./dist/iterator-helpers.js"
+    "./install": "./dist/iterator-helpers.js"
   },
   "scripts": {
     "syncify": "( cat ts/iterator-helpers-async.ts | sed -e 's/async //g' -e 's/await //g' -e 's/AsyncIterator/Iterator/g' -e 's/Symbol.asyncIterator/Symbol.iterator/g' -e 's/\"async\"/\"sync\"/g' -e 's/Promise</Identity</g' -e 's/[/][/]SYNC: //g' -e 's/❌//g' > ts/iterator-helpers-sync.ts ) && ( cat ts/iterator-helpers-async_test.ts | sed -e 's/async //g' -e 's/await //g' -e 's/AsyncIterator/Iterator/g' > ts/iterator-helpers-sync_test.ts )",

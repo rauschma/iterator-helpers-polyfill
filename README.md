@@ -28,6 +28,8 @@ npm install @rauschma/iterator-helpers-polyfill
 ## Examples
 
 ```js
+import '@rauschma/iterator-helpers-polyfill/install'; // install polyfill globally
+
 function* createIterator() {
   yield 'a'; yield 'b'; yield 'c'; yield 'd';
 }
