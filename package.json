@@ -1,5 +1,6 @@
 {
   "name": "@rauschma/iterator-helpers-polyfill",
+  "description": "A polyfill for the ECMAScript proposal “Iterator Helpers”",
   "version": "0.1.0",
   "author": "Axel Rauschmayer",
   "keywords": [
