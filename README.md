@@ -1,11 +1,53 @@
 # Iterator helpers polyfill
 
-**Warning** – don’t trust this code:
+## Warning
+
+**Don’t trust this code:**
 
 * It’s mostly untested.
-* I cut corners for the TypeScript types.
+* I cut corners to make the TypeScript types work.
 
-Material on iterator helpers:
+Caveats:
+
+* The focus is on simple code, not on spec compliance.
+* I use textual search-and-replace to convert the asynchronous code to synchronous code.
+  * Performed via: `npm run syncify`
+
+## Installation
+
+```js
+npm install @rauschma/iterator-helpers-polyfill
+```
+
+## Examples
+
+```js
+function* createIterator() {
+  yield 'a'; yield 'b'; yield 'c'; yield 'd';
+}
+
+assert.deepEqual(
+  createIterator().map(x => x + x).toArray(),
+  ['aa', 'bb', 'cc', 'dd']
+);
+
+assert.deepEqual(
+  createIterator().filter(x => x <= 'b').toArray(),
+  ['a', 'b']
+);
+
+assert.deepEqual(
+  createIterator().take(1).toArray(),
+  ['a']
+);
+```
+
+More examples:
+
+* [`ts/iterator-helpers-sync_test.ts`](https://github.com/rauschma/iterator-helpers-polyfill/blob/main/ts/iterator-helpers-sync_test.ts)
+* [`ts/iterator-helpers-async_test.ts`](https://github.com/rauschma/iterator-helpers-polyfill/blob/main/ts/iterator-helpers-async_test.ts)
+
+## Material on iterator helpers
 
 * ECMAScript proposal: https://github.com/tc39/proposal-iterator-helpers
 * Blog post: https://2ality.com/2022/12/iterator-helpers.html
