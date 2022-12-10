@@ -2,7 +2,7 @@
 
 import * as assert from 'node:assert/strict';
 import test from 'node:test';
-import './iterator-helpers.js';
+import './install-polyfill.js';
 
 function* createIterable() {
   yield 'a'; yield 'b'; yield 'c'; yield 'd';

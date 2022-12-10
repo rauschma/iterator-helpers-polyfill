@@ -1,15 +1,16 @@
 import * as assert from 'node:assert/strict';
 import test from 'node:test';
-import './iterator-helpers.js';
+import './install-polyfill.js';
+import { XAsyncIterator } from './iterator-helpers-async.js';
 
-async function* createIterator() {
-  yield 'a'; yield 'b'; yield 'c'; yield 'd';
-}
+test('Polyfill', async (t) => {
+  async function* createAsyncIterator() {
+    yield 'a'; yield 'b'; yield 'c'; yield 'd';
+  }
 
-test('Polyfilling', {only: true}, async (t) => {
   // Was AsyncIterator created correctly?
   assert.ok(
-    AsyncIterator.prototype.isPrototypeOf(createIterator())
+    AsyncIterator.prototype.isPrototypeOf(createAsyncIterator())
   );
   assert.ok(
     Reflect.ownKeys(AsyncIterator.prototype).includes('take')
@@ -17,84 +18,133 @@ test('Polyfilling', {only: true}, async (t) => {
   assert.ok(
     Reflect.ownKeys(AsyncIterator.prototype).includes('drop')
   );
-});
-
-test('map', async (t) => {
+  
   assert.deepEqual(
-    await createIterator().map(x => x + x).toArray(),
+    await createAsyncIterator().map(x => x + x).toArray(),
     ['aa', 'bb', 'cc', 'dd']
   );
-});
 
-test('filter', async (t) => {
   assert.deepEqual(
-    await createIterator().filter(x => x <= 'b').toArray(),
+    await createAsyncIterator().filter(x => x <= 'b').toArray(),
     ['a', 'b']
   );
-});
 
-test('take', async (t) => {
   assert.deepEqual(
-    await createIterator().take(1).toArray(),
+    await createAsyncIterator().take(1).toArray(),
     ['a']
   );
-});
 
-test('drop', async (t) => {
   assert.deepEqual(
-    await createIterator().drop(1).toArray(),
+    await createAsyncIterator().drop(1).toArray(),
     ['b', 'c', 'd']
   );
-});
 
-test('flatMap', async (t) => {
   assert.deepEqual(
-    await createIterator()
+    await createAsyncIterator()
     .flatMap((x,i) => new Array(i).fill(x))
     .toArray(),
     ['b', 'c', 'c', 'd', 'd', 'd']
   );
-});
 
-test('reduce', async (t) => {
   assert.deepEqual(
-    await createIterator()
+    await createAsyncIterator()
     .reduce((acc, x) => acc + x),
     'abcd'
   );
   assert.deepEqual(
-    await createIterator()
+    await createAsyncIterator()
     .reduce((acc, x) => acc + x, '>'),
     '>abcd'
   );
-});
 
-test('forEach', async (t) => {
   const result: Array<string> = [];
-  await createIterator().forEach(x => result.push(x));
+  await createAsyncIterator().forEach(x => result.push(x));
   assert.deepEqual(
     result,
     ['a', 'b', 'c', 'd']
   );
-});
 
-test('some', async (t) => {
   assert.deepEqual(
-    await createIterator().some(x => x === 'c'),
+    await createAsyncIterator().some(x => x === 'c'),
     true
   );
-});
 
-test('every', async (t) => {
   assert.deepEqual(
-    await createIterator().every(x => x === 'c'),
+    await createAsyncIterator().every(x => x === 'c'),
     false
+  );
+
+  assert.deepEqual(
+    await createAsyncIterator().find((_, i) => i === 1),
+    'b'
   );
 });
 
-test('find', async (t) => {
+test('Library class', async (t) => {
+  function createXAsyncIterator() {
+    async function* gen() {
+      yield 'a'; yield 'b'; yield 'c'; yield 'd';
+    }
+    return XAsyncIterator.from(gen());
+  }
+  
   assert.deepEqual(
-    await createIterator().find((_, i) => i === 1),
+    await createXAsyncIterator().map(x => x + x).toArray(),
+    ['aa', 'bb', 'cc', 'dd']
+  );
+
+  assert.deepEqual(
+    await createXAsyncIterator().filter(x => x <= 'b').toArray(),
+    ['a', 'b']
+  );
+
+  assert.deepEqual(
+    await createXAsyncIterator().take(1).toArray(),
+    ['a']
+  );
+
+  assert.deepEqual(
+    await createXAsyncIterator().drop(1).toArray(),
+    ['b', 'c', 'd']
+  );
+
+  assert.deepEqual(
+    await createXAsyncIterator()
+    .flatMap((x,i) => new Array(i).fill(x))
+    .toArray(),
+    ['b', 'c', 'c', 'd', 'd', 'd']
+  );
+
+  assert.deepEqual(
+    await createXAsyncIterator()
+    .reduce((acc, x) => acc + x),
+    'abcd'
+  );
+  assert.deepEqual(
+    await createXAsyncIterator()
+    .reduce((acc, x) => acc + x, '>'),
+    '>abcd'
+  );
+
+  const result: Array<string> = [];
+  await createXAsyncIterator().forEach(x => result.push(x));
+  assert.deepEqual(
+    result,
+    ['a', 'b', 'c', 'd']
+  );
+
+  assert.deepEqual(
+    await createXAsyncIterator().some(x => x === 'c'),
+    true
+  );
+
+  assert.deepEqual(
+    await createXAsyncIterator().every(x => x === 'c'),
+    false
+  );
+
+  assert.deepEqual(
+    await createXAsyncIterator().find((_, i) => i === 1),
     'b'
   );
 });
