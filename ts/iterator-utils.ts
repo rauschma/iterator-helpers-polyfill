@@ -39,7 +39,7 @@ Object.setPrototypeOf(AsyncFromSyncIterator.prototype, AsyncIteratorPrototype)
 
 //========== getIterator ==========
 
-export function getIterator<T>(obj: Record<symbol,any>, hint: 'sync' | 'async'): T {
+export function GetIteratorFlattenable<T>(obj: Record<symbol,any>, hint: 'sync' | 'async'): T {
   if (!isObject(obj)) {
     throw new TypeError();
   }
@@ -76,4 +76,20 @@ function isObject(value: unknown) {
   if (value === null) return false;
   const t = typeof value;
   return t === 'object' || t === 'function';
+}
+
+export function getAsyncIterator<T>(iterableOrIterator: AsyncIterable<T> | AsyncIterator<T>): AsyncIterator<T> {
+  if (Symbol.asyncIterator in iterableOrIterator) {
+    return iterableOrIterator[Symbol.asyncIterator]();
+  } else {
+    return iterableOrIterator as AsyncIterator<T>;
+  }
+}
+
+export function getIterator<T>(iterableOrIterator: Iterable<T> | Iterator<T>): Iterator<T> {
+  if (Symbol.iterator in iterableOrIterator) {
+    return (iterableOrIterator as Iterable<T>)[Symbol.iterator]();
+  } else {
+    return iterableOrIterator as Iterator<T>;
+  }
 }

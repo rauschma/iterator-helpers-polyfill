@@ -1,30 +1,28 @@
-import { getIterator } from './iterator-utils.js';
+import { getIterator, GetIteratorFlattenable } from './iterator-utils.js';
 
 //========== Types ==========
 
-type Identity<T> = T;
-
 declare global {
 
-  // Alas, we can’t add .[Symbol.iterator]() to interface
-  // Iterator. That breaks the built-in AsyncGenerator interface which
-  // has a different type for this method.
+  type __ValueIdentity__<T> = T;
 
   interface Iterator<T, TReturn = any, TNext = undefined> {
+    [Symbol.iterator](): Iterator<T, TReturn, TNext>;
+
     map<U>(mapper: (value: T, counter: number) => U): Iterator<U>;
     filter(filterer: (value: T, counter: number) => boolean): Iterator<T>;
     take(limit: number): Iterator<T>;
     drop(limit: number): Iterator<T>;
-    flatMap<U>(mapper: (value: T, counter: number) => Array<U>): Iterator<U>;
+    flatMap<U>(mapper: (value: T, counter: number) => Iterable<U>): Iterator<U>;
     reduce<U>(
       reducer: (accumulator: U, value: T, counter: number) => U,
       initialValue?: U
-    ): Identity<U>;
-    toArray(): Identity<Array<T>>;
-    forEach(fn: (value: T, counter: number) => void): Identity<void>;
-    some(fn: (value: T, counter: number) => boolean): Identity<boolean>;
-    every(fn: (value: T, counter: number) => boolean): Identity<boolean>;
-    find(fn: (value: T, counter: number) => boolean): Identity<undefined | T>;
+    ): __ValueIdentity__<U>;
+    toArray(): __ValueIdentity__<Array<T>>;
+    forEach(fn: (value: T, counter: number) => void): __ValueIdentity__<void>;
+    some(fn: (value: T, counter: number) => boolean): __ValueIdentity__<boolean>;
+    every(fn: (value: T, counter: number) => boolean): __ValueIdentity__<boolean>;
+    find(fn: (value: T, counter: number) => boolean): __ValueIdentity__<undefined | T>;
     toAsync(): AsyncIterator<T>;
   }
 
@@ -42,12 +40,12 @@ declare global {
 const NO_INITIAL_VALUE = Symbol('NO_INITIAL_VALUE');
 
 abstract class Methods<T, TReturn = any, TNext = undefined> implements Iterator<T, TReturn, TNext> {
-  abstract next(...args: [] | [TNext]): Identity<IteratorResult<T, TReturn>>;
-  abstract [Symbol.iterator](): Iterator<T>;
+  abstract next(...args: [] | [TNext]): __ValueIdentity__<IteratorResult<T, TReturn>>;
+  abstract [Symbol.iterator](): Iterator<T, TReturn, TNext>;
 
   * map<U>(mapper: (value: T, counter: number) => U): Iterator<U> {
     let counter = 0;
-    for (const value of this) {
+    for (const value of this as Iterable<T>) {
       yield mapper(value, counter);
       counter++;
     }
@@ -55,7 +53,7 @@ abstract class Methods<T, TReturn = any, TNext = undefined> implements Iterator<
 
   * filter(filterer: (value: T, counter: number) => boolean): Iterator<T> {
     let counter = 0;
-    for (const value of this) {
+    for (const value of this as Iterable<T>) {
       if (filterer(value, counter)) {
         yield value;
       }
@@ -65,7 +63,7 @@ abstract class Methods<T, TReturn = any, TNext = undefined> implements Iterator<
 
   * take(limit: number): Iterator<T> {
     let counter = 0;
-    for (const value of this) {
+    for (const value of this as Iterable<T>) {
       if (counter >= limit) break;
       yield value;
       counter++;
@@ -74,7 +72,7 @@ abstract class Methods<T, TReturn = any, TNext = undefined> implements Iterator<
 
   * drop(limit: number): Iterator<T> {
     let counter = 0;
-    for (const value of this) {
+    for (const value of this as Iterable<T>) {
       if (counter >= limit) {
         yield value;
       }
@@ -82,9 +80,9 @@ abstract class Methods<T, TReturn = any, TNext = undefined> implements Iterator<
     }
   }
 
-  * flatMap<U>(mapper: (value: T, counter: number) => Array<U>): Iterator<U> {
+  * flatMap<U>(mapper: (value: T, counter: number) => Iterable<U>): Iterator<U> {
     let counter = 0;
-    for (const value of this) {
+    for (const value of this as Iterable<T>) {
       yield* mapper(value, counter);
       counter++;
     }
@@ -93,10 +91,10 @@ abstract class Methods<T, TReturn = any, TNext = undefined> implements Iterator<
   reduce<U>(
     reducer: (accumulator: U, value: T, counter: number) => U,
     initialValue: typeof NO_INITIAL_VALUE | U = NO_INITIAL_VALUE
-  ): Identity<U> {
+  ): __ValueIdentity__<U> {
     let accumulator = initialValue;
     let counter = 0;
-    for (const value of this) {
+    for (const value of this as Iterable<T>) {
       if (accumulator === NO_INITIAL_VALUE) {
         accumulator = value as any;
         continue;
@@ -109,23 +107,23 @@ abstract class Methods<T, TReturn = any, TNext = undefined> implements Iterator<
     }
     return accumulator;  
   }
-  toArray(): Identity<Array<T>> {
+  toArray(): __ValueIdentity__<Array<T>> {
     const result = [];
-    for (const x of this) {
+    for (const x of this as Iterable<T>) {
       result.push(x);
     }
     return result;
   }
-  forEach(fn: (value: T, counter: number) => void): Identity<void> {
+  forEach(fn: (value: T, counter: number) => void): __ValueIdentity__<void> {
     let counter = 0;
-    for (const value of this) {
+    for (const value of this as Iterable<T>) {
       fn(value, counter);
       counter++;
     }
   }
-  some(fn: (value: T, counter: number) => boolean): Identity<boolean> {
+  some(fn: (value: T, counter: number) => boolean): __ValueIdentity__<boolean> {
     let counter = 0;
-    for (const value of this) {
+    for (const value of this as Iterable<T>) {
       if (fn(value, counter)) {
         return true;
       }
@@ -133,9 +131,9 @@ abstract class Methods<T, TReturn = any, TNext = undefined> implements Iterator<
     }
     return false;
   }
-  every(fn: (value: T, counter: number) => boolean): Identity<boolean> {
+  every(fn: (value: T, counter: number) => boolean): __ValueIdentity__<boolean> {
     let counter = 0;
-    for (const value of this) {
+    for (const value of this as Iterable<T>) {
       if (!fn(value, counter)) {
         return false;
       }
@@ -143,9 +141,9 @@ abstract class Methods<T, TReturn = any, TNext = undefined> implements Iterator<
     }
     return true;
   }
-  find(fn: (value: T, counter: number) => boolean): Identity<undefined | T> {
+  find(fn: (value: T, counter: number) => boolean): __ValueIdentity__<undefined | T> {
     let counter = 0;
-    for (const value of this) {
+    for (const value of this as Iterable<T>) {
       if (fn(value, counter)) {
         return value;
       }
@@ -153,14 +151,16 @@ abstract class Methods<T, TReturn = any, TNext = undefined> implements Iterator<
     }
     return undefined;
   }
-  async * toAsync() {yield* this}
+  async * toAsync(): AsyncIterator<T> {yield* this as any}
 };
 
 //========== Library class ==========
 
 export class XIterator<T> extends Methods<T> {
-  static from<U>(iterable: Iterable<U>|Iterator<U>): XIterator<U> {
-    return new XIterator((iterable as Iterable<U>)[Symbol.iterator]());
+  static from<U>(iterableOrIterator: Iterable<U> | Iterator<U>): XIterator<U> {
+    return new XIterator(
+      getIterator(iterableOrIterator)
+    );
   }
 
   #iterator;
@@ -172,7 +172,7 @@ export class XIterator<T> extends Methods<T> {
 
   //----- Implemented abstract methods -----
 
-  next(): Identity<IteratorResult<T>> {
+  next(): __ValueIdentity__<IteratorResult<T>> {
     return this.#iterator.next();
   }
   [Symbol.iterator](): Iterator<T> {
@@ -197,7 +197,7 @@ export class XIterator<T> extends Methods<T> {
     return XIterator.from(super.drop(limit));
   }
 
-  override flatMap<U>(mapper: (value: T, counter: number) => Array<U>): Iterator<U> {
+  override flatMap<U>(mapper: (value: T, counter: number) => Iterable<U>): Iterator<U> {
     return XIterator.from(super.flatMap(mapper));
   }
 }
@@ -259,11 +259,11 @@ export function installIteratorPolyfill() {
       super();
       this.#iterator = iterator;
     }
-    override next(...args: [] | [TNext]): Identity<IteratorResult<T, TReturn>> {
+    override next(...args: [] | [TNext]): __ValueIdentity__<IteratorResult<T, TReturn>> {
       return this.#iterator.next(...args);
     }
     // `async` helps with line (*)
-    override return(value?: TReturn | PromiseLike<TReturn>): Identity<IteratorResult<T, TReturn>> {
+    override return(value?: TReturn | PromiseLike<TReturn>): __ValueIdentity__<IteratorResult<T, TReturn>> {
       const returnMethod = this.#iterator.return;
       if (returnMethod === undefined) {
         return {done: true, value: value as any}; // (*)
@@ -273,7 +273,7 @@ export function installIteratorPolyfill() {
   }
 
   function Iterator_from<T>(value: any) {
-    const iterator = getIterator<Iterator<T>>(value, "sync"); // different quotes for `npm run syncify`
+    const iterator = GetIteratorFlattenable<Iterator<T>>(value, "sync"); // different quotes for `npm run syncify`
     if (iterator instanceof Iterator) {
       return iterator;
     }
