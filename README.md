@@ -32,22 +32,21 @@ npm install @rauschma/iterator-helpers-polyfill
 import assert from 'node:assert/strict';
 import '@rauschma/iterator-helpers-polyfill/install'; // install polyfill globally
 
-function* createIterator() {
-  yield 'a'; yield 'b'; yield 'c'; yield 'd';
-}
-
 assert.deepEqual(
-  createIterator().map(x => x + x).toArray(),
-  ['aa', 'bb', 'cc', 'dd']
+  new Set(['a', 'b', 'c']).values()
+  .map(x => x + x).toArray(),
+  ['aa', 'bb', 'cc']
 );
 
 assert.deepEqual(
-  createIterator().filter(x => x <= 'b').toArray(),
+  new Set(['a', 'b', 'c']).values()
+  .filter(x => x <= 'b').toArray(),
   ['a', 'b']
 );
 
 assert.deepEqual(
-  createIterator().take(1).toArray(),
+  new Set(['a', 'b', 'c']).values()
+  .take(1).toArray(),
   ['a']
 );
 ```
@@ -58,22 +57,21 @@ assert.deepEqual(
 import assert from 'node:assert/strict';
 import {XIterator} from '@rauschma/iterator-helpers-polyfill';
 
-function createXIterator() {
-  return XIterator.from(['a', 'b', 'c', 'd']);
-}
-
 assert.deepEqual(
-  createXIterator().map(x => x + x).toArray(),
-  ['aa', 'bb', 'cc', 'dd']
+  XIterator.from(new Set(['a', 'b', 'c']))
+  .map(x => x + x).toArray(),
+  ['aa', 'bb', 'cc']
 );
 
 assert.deepEqual(
-  createXIterator().filter(x => x <= 'b').toArray(),
+  XIterator.from(new Set(['a', 'b', 'c']))
+  .filter(x => x <= 'b').toArray(),
   ['a', 'b']
 );
 
 assert.deepEqual(
-  createXIterator().take(1).toArray(),
+  XIterator.from(new Set(['a', 'b', 'c']))
+  .take(1).toArray(),
   ['a']
 );
 ```
