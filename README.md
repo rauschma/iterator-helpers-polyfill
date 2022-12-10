@@ -12,7 +12,7 @@ Caveats:
 * The focus is on simple code, not on spec compliance.
 * I use textual search-and-replace to convert the asynchronous code to synchronous code.
   * Performed via: `npm run syncify`
-* The only way to use this polyfill is by installing it globally.
+* The only way to use this polyfill is by installing it into JavaScript’s global variables.
 
 Functionality:
 
