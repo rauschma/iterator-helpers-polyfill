@@ -78,22 +78,6 @@ function isObject(value: unknown) {
   return t === 'object' || t === 'function';
 }
 
-export function getAsyncIterator<T>(iterableOrIterator: LegacyIterable<T> | LegacyAsyncIterable<T> | LegacyAsyncIterator<T>): LegacyAsyncIterator<T> {
-  if (Symbol.asyncIterator in iterableOrIterator) {
-    return iterableOrIterator[Symbol.asyncIterator]();
-  } else {
-    return iterableOrIterator as LegacyAsyncIterator<T>;
-  }
-}
-
-export function getIterator<T>(iterableOrIterator: Iterable<T> | Iterator<T>): Iterator<T> {
-  if (Symbol.iterator in iterableOrIterator) {
-    return (iterableOrIterator as Iterable<T>)[Symbol.iterator]();
-  } else {
-    return iterableOrIterator as Iterator<T>;
-  }
-}
-
 //========== Helper types ==========
 
 export interface LegacyIterable<T> {

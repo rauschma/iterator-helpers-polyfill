@@ -1,5 +1,5 @@
 import { AbstractAsyncIterator, IAsyncIterator } from './library-async.js';
-import { GetIteratorFlattenable, LegacyAsyncIterable, LegacyAsyncIterator, LegacyIterable } from './util.js';
+import * as util from './util.js';
 
 //========== Types ==========
 
@@ -7,7 +7,7 @@ declare global {
   interface AsyncIterator<T, TReturn = any, TNext = undefined> extends IAsyncIterator<T, TReturn, TNext> {}
 
   interface AsyncIteratorConstructor {
-    from<U>(iterableOrIterator: LegacyIterable<U> | LegacyAsyncIterable<U> | LegacyAsyncIterator<U>): AsyncIterator<U>;
+    from<U>(iterableOrIterator: util.LegacyIterable<U> | util.LegacyAsyncIterable<U> | util.LegacyAsyncIterator<U>): AsyncIterator<U>;
     new <T, TReturn = any, TNext = undefined>(): AsyncIterator<T, TReturn, TNext>;
     readonly prototype: AsyncIterator<object>;
   }
@@ -88,7 +88,7 @@ export function installAsyncIteratorPolyfill() {
   }
 
   function AsyncIterator_from<T>(value: any) {
-    const iterator = GetIteratorFlattenable<AsyncIterator<T>>(value, "async"); // different quotes for `npm run syncify`
+    const iterator = util.GetIteratorFlattenable<AsyncIterator<T>>(value, "async"); // different quotes for `npm run syncify`
     if (iterator instanceof AsyncIterator) {
       return iterator;
     }

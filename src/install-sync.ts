@@ -1,5 +1,5 @@
 import { AbstractIterator, IIterator } from './library-sync.js';
-import { GetIteratorFlattenable, LegacyIterable, LegacyIterator, LegacyIterable } from './util.js';
+import * as util from './util.js';
 
 //========== Types ==========
 
@@ -7,7 +7,7 @@ declare global {
   interface Iterator<T, TReturn = any, TNext = undefined> extends IIterator<T, TReturn, TNext> {}
 
   interface IteratorConstructor {
-    from<U>(iterableOrIterator: LegacyIterable<U> | LegacyIterable<U> | LegacyIterator<U>): Iterator<U>;
+    from<U>(iterableOrIterator: util.LegacyIterable<U> | util.LegacyIterable<U> | util.LegacyIterator<U>): Iterator<U>;
     new <T, TReturn = any, TNext = undefined>(): Iterator<T, TReturn, TNext>;
     readonly prototype: Iterator<object>;
   }
@@ -88,7 +88,7 @@ export function installIteratorPolyfill() {
   }
 
   function Iterator_from<T>(value: any) {
-    const iterator = GetIteratorFlattenable<Iterator<T>>(value, "sync"); // different quotes for `npm run syncify`
+    const iterator = util.GetIteratorFlattenable<Iterator<T>>(value, "sync"); // different quotes for `npm run syncify`
     if (iterator instanceof Iterator) {
       return iterator;
     }

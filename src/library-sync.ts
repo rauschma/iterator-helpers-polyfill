@@ -1,4 +1,4 @@
-import { getIterator, LegacyIterable, LegacyIterator, LegacyIterable } from './util.js';
+import * as util from './util.js';
 import { XAsyncIterator } from './library-async.js';
 
 //========== Types ==========
@@ -152,15 +152,17 @@ export abstract class AbstractIterator<T, TReturn = any, TNext = undefined> impl
 //========== Library class ==========
 
 export class XIterator<T> extends AbstractIterator<T> {
-  static from<U>(iterableOrIterator: LegacyIterable<U> | LegacyIterable<U> | LegacyIterator<U>): XIterator<U> {
-    return new XIterator(
-      getIterator(iterableOrIterator)
-    );
+  static from<U>(iterableOrIterator: util.LegacyIterable<U> | util.LegacyIterable<U> | util.LegacyIterator<U>): XIterator<U> {
+    const iterator = util.GetIteratorFlattenable<Iterator<U>>(iterableOrIterator as unknown as Record<symbol,any>, "sync"); // different quotes for `npm run syncify`
+    if (iterator instanceof XIterator) {
+      return iterator;
+    }
+    return new XIterator( iterator );
   }
 
   #iterator;
 
-  private constructor(iterator: LegacyIterator<T>) {
+  private constructor(iterator: util.LegacyIterator<T>) {
     super();
     this.#iterator = iterator;
   }
