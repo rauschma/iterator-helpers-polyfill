@@ -14,7 +14,6 @@
     "url": "git+https://github.com/rauschma/iterator-helpers-polyfill.git"
   },
   "license": "MIT",
-
   "type": "module",
   "exports": {
     ".": "./dist/iterator-helpers.js",
@@ -34,6 +33,7 @@
   },
   "devDependencies": {
     "@types/node": "^18.11.12",
-    "shx": "^0.3.4"
+    "shx": "^0.3.4",
+    "typescript": "^4.9.4"
   }
 }
