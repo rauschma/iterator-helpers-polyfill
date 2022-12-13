@@ -1,7 +1,7 @@
 {
   "name": "@rauschma/iterator-helpers-polyfill",
   "description": "A polyfill for the ECMAScript proposal “Iterator Helpers”",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "author": "Axel Rauschmayer",
   "keywords": [
     "javascript",
@@ -14,18 +14,18 @@
     "url": "git+https://github.com/rauschma/iterator-helpers-polyfill.git"
   },
   "license": "MIT",
-
   "type": "module",
   "exports": {
-    ".": "./dist/iterator-helpers.js",
-    "./install": "./dist/install-polyfill.js"
+    ".": "./dist/src/library.js",
+    "./install": "./dist/src/install.js"
   },
   "scripts": {
-    "syncify": "npm run syncify-lib && npm run syncify-tests",
-    "syncify-lib": "cat ts/iterator-helpers-async.ts | sed -e 's/async //g' -e 's/await //g' -e 's/AsyncIterable/Iterable/g' -e 's/AsyncIterator/Iterator/g' -e 's/Symbol.asyncIterator/Symbol.iterator/g' -e 's/\"async\"/\"sync\"/g' -e 's/Promise</__ValueIdentity__</g' -e 's/[/][/]SYNC: //g' -e 's/❌//g' > ts/iterator-helpers-sync.ts",
-    "syncify-tests": "cat ts/iterator-helpers-async_test.ts | sed -e 's/async //g' -e 's/await //g' -e 's/AsyncIterator/Iterator/g' -e 's/iterator-helpers-async/iterator-helpers-sync/g' > ts/iterator-helpers-sync_test.ts",
+    "syncify": "npm run syncify-library && npm run syncify-install && npm run syncify-tests",
+    "syncify-library": "cat src/library-async.ts | sed -e 's/async //g' -e 's/await //g' -e 's/AsyncIterable/Iterable/g' -e 's/AsyncIterator/Iterator/g' -e 's/Symbol.asyncIterator/Symbol.iterator/g' -e 's/\"async\"/\"sync\"/g' -e 's/Promise</__ValueIdentity__</g' -e 's/[/][/]SYNC: //g' -e 's/❌//g' > src/library-sync.ts",
+    "syncify-install": "cat src/install-async.ts | sed -e 's/async //g' -e 's/await //g' -e 's/AsyncIterable/Iterable/g' -e 's/AsyncIterator/Iterator/g' -e 's/Symbol.asyncIterator/Symbol.iterator/g' -e 's/\"async\"/\"sync\"/g' -e 's/Promise</__ValueIdentity__</g' -e 's/[/][/]SYNC: //g' -e 's/❌//g' -e 's/library-async/library-sync/g' > src/install-sync.ts",
+    "syncify-tests": "cat test/async_test.ts | sed -e 's/async //g' -e 's/await //g' -e 's/AsyncIterator/Iterator/g' -e 's/library-async/library-sync/g' > test/sync_test.ts",
     "test": "node --test",
-    "testall": "node --test dist/*_test.js",
+    "testall": "node --test dist/test/*_test.js",
     "dry": "npm publish --dry-run",
     "prepublishOnly": "npm run syncify && npm run clean && npm run build",
     "build": "tsc",
@@ -34,6 +34,7 @@
   },
   "devDependencies": {
     "@types/node": "^18.11.12",
-    "shx": "^0.3.4"
+    "shx": "^0.3.4",
+    "typescript": "^4.9.4"
   }
 }

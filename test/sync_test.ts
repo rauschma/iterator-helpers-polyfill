@@ -1,13 +1,13 @@
 import * as assert from 'node:assert/strict';
 import test from 'node:test';
-import './install-polyfill.js';
-import { XIterator } from './iterator-helpers-sync.js';
+import '../src/install.js';
+import { XIterator } from '../src/library-sync.js';
+
+function* createIterator() {
+  yield 'a'; yield 'b'; yield 'c'; yield 'd';
+}
 
 test('Polyfill', (t) => {
-  function* createIterator() {
-    yield 'a'; yield 'b'; yield 'c'; yield 'd';
-  }
-
   // Was Iterator created correctly?
   assert.ok(
     Iterator.prototype.isPrototypeOf(createIterator())
@@ -82,10 +82,7 @@ test('Polyfill', (t) => {
 
 test('Library class', (t) => {
   function createXIterator() {
-    function* gen() {
-      yield 'a'; yield 'b'; yield 'c'; yield 'd';
-    }
-    return XIterator.from(gen());
+    return XIterator.from(createIterator());
   }
   
   assert.deepEqual(

@@ -1,6 +1,7 @@
 {
+  "include": ["src/**/*", "test/**/*"],
   "compilerOptions": {
-    "rootDir": "ts",
+    "rootDir": ".",
     "outDir": "dist",
     "target": "es2022",
     "lib": [
@@ -9,6 +10,7 @@
     "module": "ES2022",
     "strict": true,
     "noImplicitOverride": true,
+    "importsNotUsedAsValues": "error",
     //
     "sourceMap": true,
     "declaration": true,

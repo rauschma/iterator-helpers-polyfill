@@ -1,13 +1,13 @@
 import * as assert from 'node:assert/strict';
 import test from 'node:test';
-import './install-polyfill.js';
-import { XAsyncIterator } from './iterator-helpers-async.js';
+import '../src/install.js';
+import { XAsyncIterator } from '../src/library-async.js';
+
+async function* createAsyncIterator() {
+  yield 'a'; yield 'b'; yield 'c'; yield 'd';
+}
 
 test('Polyfill', async (t) => {
-  async function* createAsyncIterator() {
-    yield 'a'; yield 'b'; yield 'c'; yield 'd';
-  }
-
   // Was AsyncIterator created correctly?
   assert.ok(
     AsyncIterator.prototype.isPrototypeOf(createAsyncIterator())
@@ -82,10 +82,7 @@ test('Polyfill', async (t) => {
 
 test('Library class', async (t) => {
   function createXAsyncIterator() {
-    async function* gen() {
-      yield 'a'; yield 'b'; yield 'c'; yield 'd';
-    }
-    return XAsyncIterator.from(gen());
+    return XAsyncIterator.from(createAsyncIterator());
   }
   
   assert.deepEqual(
