@@ -3,11 +3,16 @@ import test from 'node:test';
 import '../src/install.js';
 import { XIterator } from '../src/library-sync.js';
 
-function* createIterator() {
-  yield 'a'; yield 'b'; yield 'c'; yield 'd';
-}
-
 test('Polyfill', (t) => {
+  /**
+   * - Create the iterator in a manner that can be translated to sync.
+   * - Note that the result of a generator is an iterable iterator.
+   * - In this case, we want to create an iterator and test an iterator-only style.
+   */
+  function* createIterator() {
+    yield 'a'; yield 'b'; yield 'c'; yield 'd';
+  }
+
   // Was Iterator created correctly?
   assert.ok(
     Iterator.prototype.isPrototypeOf(createIterator())
@@ -81,67 +86,72 @@ test('Polyfill', (t) => {
 });
 
 test('Library class', (t) => {
-  function createXIterator() {
-    return XIterator.from(createIterator());
+  /**
+   * - Create the iterator in a manner that can be translated to sync.
+   * - Note that the result of a generator is an iterable iterator.
+   * - In this case, we want to create an iterable and test working with iterables.
+   */
+  function* createAsyncIterable() {
+    yield 'a'; yield 'b'; yield 'c'; yield 'd';
   }
   
   assert.deepEqual(
-    createXIterator().map(x => x + x).toArray(),
+    XIterator.from(createAsyncIterable()).map(x => x + x).toArray(),
     ['aa', 'bb', 'cc', 'dd']
   );
 
   assert.deepEqual(
-    createXIterator().filter(x => x <= 'b').toArray(),
+    XIterator.from(createAsyncIterable()).filter(x => x <= 'b').toArray(),
     ['a', 'b']
   );
 
   assert.deepEqual(
-    createXIterator().take(1).toArray(),
+    XIterator.from(createAsyncIterable()).take(1).toArray(),
     ['a']
   );
 
   assert.deepEqual(
-    createXIterator().drop(1).toArray(),
+    XIterator.from(createAsyncIterable()).drop(1).toArray(),
     ['b', 'c', 'd']
   );
 
   assert.deepEqual(
-    createXIterator()
+    XIterator.from(createAsyncIterable())
     .flatMap((x,i) => new Array(i).fill(x))
     .toArray(),
     ['b', 'c', 'c', 'd', 'd', 'd']
   );
 
   assert.deepEqual(
-    createXIterator()
+    XIterator.from(createAsyncIterable())
     .reduce((acc, x) => acc + x),
     'abcd'
   );
   assert.deepEqual(
-    createXIterator()
+    XIterator.from(createAsyncIterable())
     .reduce((acc, x) => acc + x, '>'),
     '>abcd'
   );
 
   const result: Array<string> = [];
-  createXIterator().forEach(x => result.push(x));
+  XIterator.from(createAsyncIterable()).forEach(x => result.push(x));
   assert.deepEqual(
     result,
     ['a', 'b', 'c', 'd']
   );
 
   assert.deepEqual(
-    createXIterator().some(x => x === 'c'),
+    XIterator.from(createAsyncIterable()).some(x => x === 'c'),
     true
   );
 
   assert.deepEqual(
-    createXIterator().every(x => x === 'c'),
+    XIterator.from(createAsyncIterable()).every(x => x === 'c'),
     false
   );
 
   assert.deepEqual(
-    createXIterator().find((_, i) => i === 1),
+    XIterator.from(createAsyncIterable()).find((_, i) => i === 1),
     'b'
   );
 });
