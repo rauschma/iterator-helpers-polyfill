@@ -1,5 +1,5 @@
 import { AbstractAsyncIterator, IAsyncIterator } from './library-async.js';
-import { GetIteratorFlattenable } from './util.js';
+import { GetIteratorFlattenable, LegacyAsyncIterable, LegacyAsyncIterator, LegacyIterable } from './util.js';
 
 //========== Types ==========
 
@@ -7,6 +7,7 @@ declare global {
   interface AsyncIterator<T, TReturn = any, TNext = undefined> extends IAsyncIterator<T, TReturn, TNext> {}
 
   interface AsyncIteratorConstructor {
+    from<U>(iterableOrIterator: LegacyIterable<U> | LegacyAsyncIterable<U> | LegacyAsyncIterator<U>): AsyncIterator<U>;
     new <T, TReturn = any, TNext = undefined>(): AsyncIterator<T, TReturn, TNext>;
     readonly prototype: AsyncIterator<object>;
   }

@@ -1,4 +1,4 @@
-import { getAsyncIterator } from './util.js';
+import { getAsyncIterator, LegacyAsyncIterable, LegacyAsyncIterator, LegacyIterable } from './util.js';
 //SYNC: import { XAsync❌Iterator } from './library-async.js';
 
 //========== Types ==========
@@ -152,7 +152,7 @@ export abstract class AbstractAsyncIterator<T, TReturn = any, TNext = undefined>
 //========== Library class ==========
 
 export class XAsyncIterator<T> extends AbstractAsyncIterator<T> {
-  static from<U>(iterableOrIterator: AsyncIterable<U> | AsyncIterator<U>): XAsyncIterator<U> {
+  static from<U>(iterableOrIterator: LegacyIterable<U> | LegacyAsyncIterable<U> | LegacyAsyncIterator<U>): XAsyncIterator<U> {
     return new XAsyncIterator(
       getAsyncIterator(iterableOrIterator)
     );
@@ -160,7 +160,7 @@ export class XAsyncIterator<T> extends AbstractAsyncIterator<T> {
 
   #iterator;
 
-  private constructor(iterator: AsyncIterator<T>) {
+  private constructor(iterator: LegacyAsyncIterator<T>) {
     super();
     this.#iterator = iterator;
   }

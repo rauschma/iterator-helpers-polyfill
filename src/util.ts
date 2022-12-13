@@ -70,7 +70,7 @@ export function GetIteratorFlattenable<T>(obj: Record<symbol,any>, hint: 'sync' 
   return iterator;
 }
 
-//========== Helpers ==========
+//========== Helper functions ==========
 
 function isObject(value: unknown) {
   if (value === null) return false;
@@ -78,11 +78,11 @@ function isObject(value: unknown) {
   return t === 'object' || t === 'function';
 }
 
-export function getAsyncIterator<T>(iterableOrIterator: AsyncIterable<T> | AsyncIterator<T>): AsyncIterator<T> {
+export function getAsyncIterator<T>(iterableOrIterator: LegacyIterable<T> | LegacyAsyncIterable<T> | LegacyAsyncIterator<T>): LegacyAsyncIterator<T> {
   if (Symbol.asyncIterator in iterableOrIterator) {
     return iterableOrIterator[Symbol.asyncIterator]();
   } else {
-    return iterableOrIterator as AsyncIterator<T>;
+    return iterableOrIterator as LegacyAsyncIterator<T>;
   }
 }
 
@@ -92,4 +92,22 @@ export function getIterator<T>(iterableOrIterator: Iterable<T> | Iterator<T>): I
   } else {
     return iterableOrIterator as Iterator<T>;
   }
+}
+
+//========== Helper types ==========
+
+export interface LegacyIterable<T> {
+  [Symbol.iterator](): LegacyIterator<T>;
+}
+
+export interface LegacyAsyncIterable<T> {
+  [Symbol.asyncIterator](): LegacyAsyncIterator<T>;
+}
+
+export interface LegacyIterator<T> {
+  next(): IteratorResult<T>;
+}
+
+export interface LegacyAsyncIterator<T> {
+  next(): Promise<IteratorResult<T>>;
 }

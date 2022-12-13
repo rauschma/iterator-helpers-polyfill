@@ -1,7 +1,7 @@
 {
   "name": "@rauschma/iterator-helpers-polyfill",
   "description": "A polyfill for the ECMAScript proposal “Iterator Helpers”",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "author": "Axel Rauschmayer",
   "keywords": [
     "javascript",
@@ -23,7 +23,7 @@
     "syncify": "npm run syncify-library && npm run syncify-install && npm run syncify-tests",
     "syncify-library": "cat src/library-async.ts | sed -e 's/async //g' -e 's/await //g' -e 's/AsyncIterable/Iterable/g' -e 's/AsyncIterator/Iterator/g' -e 's/Symbol.asyncIterator/Symbol.iterator/g' -e 's/\"async\"/\"sync\"/g' -e 's/Promise</__ValueIdentity__</g' -e 's/[/][/]SYNC: //g' -e 's/❌//g' > src/library-sync.ts",
     "syncify-install": "cat src/install-async.ts | sed -e 's/async //g' -e 's/await //g' -e 's/AsyncIterable/Iterable/g' -e 's/AsyncIterator/Iterator/g' -e 's/Symbol.asyncIterator/Symbol.iterator/g' -e 's/\"async\"/\"sync\"/g' -e 's/Promise</__ValueIdentity__</g' -e 's/[/][/]SYNC: //g' -e 's/❌//g' -e 's/library-async/library-sync/g' > src/install-sync.ts",
-    "syncify-tests": "cat test/async_test.ts | sed -e 's/async //g' -e 's/await //g' -e 's/AsyncIterator/Iterator/g' -e 's/library-async/library-sync/g' > test/sync_test.ts",
+    "syncify-tests": "cat test/async_test.ts | sed -e 's/async //g' -e 's/await //g' -e 's/AsyncIterator/Iterator/g' -e 's/Promise.resolve//g' -e 's/[/][/]SYNC: //g' -e 's/Promise</__ValueIdentity__</g' -e 's/library-async/library-sync/g' > test/sync_test.ts",
     "test": "node --test",
     "testall": "node --test dist/test/*_test.js",
     "dry": "npm publish --dry-run",

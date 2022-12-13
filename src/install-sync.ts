@@ -1,5 +1,5 @@
 import { AbstractIterator, IIterator } from './library-sync.js';
-import { GetIteratorFlattenable } from './util.js';
+import { GetIteratorFlattenable, LegacyIterable, LegacyIterator, LegacyIterable } from './util.js';
 
 //========== Types ==========
 
@@ -7,6 +7,7 @@ declare global {
   interface Iterator<T, TReturn = any, TNext = undefined> extends IIterator<T, TReturn, TNext> {}
 
   interface IteratorConstructor {
+    from<U>(iterableOrIterator: LegacyIterable<U> | LegacyIterable<U> | LegacyIterator<U>): Iterator<U>;
     new <T, TReturn = any, TNext = undefined>(): Iterator<T, TReturn, TNext>;
     readonly prototype: Iterator<object>;
   }

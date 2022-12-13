@@ -2,18 +2,22 @@ import * as assert from 'node:assert/strict';
 import test from 'node:test';
 import '../src/install.js';
 import { XAsyncIterator } from '../src/library-async.js';
+import type { LegacyAsyncIterator, LegacyIterable } from '../src/util.js';
 
-test('Polyfill', async (t) => {
-  /**
-   * - Create the iterator in a manner that can be translated to sync.
-   * - Note that the result of a generator is an iterable iterator.
-   * - In this case, we want to create an iterator and test an iterator-only style.
-   */
-  async function* createAsyncIterator() {
-    yield 'a'; yield 'b'; yield 'c'; yield 'd';
-  }
+//SYNC: type __ValueIdentity__<T> = T;
 
-  // Was AsyncIterator created correctly?
+//========== Polyfill ==========
+
+/**
+ * - Create the iterator in a manner that can be translated to sync.
+ * - Note that the result of a generator is an iterable iterator.
+ * - In this case, we want to create an iterator and test an iterator-only style.
+ */
+async function* createAsyncIterator() {
+  yield 'a'; yield 'b'; yield 'c'; yield 'd';
+}
+
+test('Polyfill: Was AsyncIterator set up correctly?', (t) => {
   assert.ok(
     AsyncIterator.prototype.isPrototypeOf(createAsyncIterator())
   );
@@ -23,7 +27,40 @@ test('Polyfill', async (t) => {
   assert.ok(
     Reflect.ownKeys(AsyncIterator.prototype).includes('drop')
   );
-  
+});
+
+//----------
+
+test('Polyfill: AsyncIterator.from', async (t) => {
+  assert.ok(
+    AsyncIterator.from(createAsyncIterator()) instanceof AsyncIterator
+  );
+  assert.deepEqual(
+    await AsyncIterator.from(createAsyncIterator()).toArray(),
+    ['a', 'b', 'c', 'd']
+  );
+
+  const iterResults: Array<Promise<IteratorResult<string>>> = [
+    Promise.resolve({done: false, value: 'x'}),
+    Promise.resolve({done: false, value: 'y'}),
+    Promise.resolve({done: true, value: undefined}),
+  ];
+  const obj = {
+    count: 0,
+    next() {
+      return iterResults[this.count++];
+    },
+  };
+  const legacyIterator: LegacyAsyncIterator<string> = obj;
+  assert.deepEqual(
+    await AsyncIterator.from(legacyIterator).toArray(),
+    ['x', 'y']
+  );
+});
+
+//----------
+
+test('Polyfill: prototype methods', async (t) => {
   assert.deepEqual(
     await createAsyncIterator().map(x => x + x).toArray(),
     ['aa', 'bb', 'cc', 'dd']
@@ -56,6 +93,7 @@ test('Polyfill', async (t) => {
     .reduce((acc, x) => acc + x),
     'abcd'
   );
+
   assert.deepEqual(
     await createAsyncIterator()
     .reduce((acc, x) => acc + x, '>'),
@@ -85,16 +123,47 @@ test('Polyfill', async (t) => {
   );
 });
 
-test('Library class', async (t) => {
-  /**
-   * - Create the iterator in a manner that can be translated to sync.
-   * - Note that the result of a generator is an iterable iterator.
-   * - In this case, we want to create an iterable and test working with iterables.
-   */
-  async function* createAsyncIterable() {
-    yield 'a'; yield 'b'; yield 'c'; yield 'd';
-  }
-  
+//========== Library ==========
+
+/**
+ * - Create the iterable in a manner that can be translated to sync.
+ * - Note that the result of a generator is an iterable iterator.
+ * - In this case, we want to create an iterable and test working with iterables.
+ */
+async function* createAsyncIterable() {
+  yield 'a'; yield 'b'; yield 'c'; yield 'd';
+}
+
+test('Library: XAsyncIterator.from', async (t) => {
+  assert.ok(
+    XAsyncIterator.from(createAsyncIterator()) instanceof XAsyncIterator
+  );
+  assert.deepEqual(
+    await XAsyncIterator.from(createAsyncIterable()).toArray(),
+    ['a', 'b', 'c', 'd']
+  );
+
+  const iterResults: Array<Promise<IteratorResult<string>>> = [
+    Promise.resolve({done: false, value: 'x'}),
+    Promise.resolve({done: false, value: 'y'}),
+    Promise.resolve({done: true, value: undefined}),
+  ];
+  const obj = {
+    count: 0,
+    next() {
+      return iterResults[this.count++];
+    },
+  };
+  const legacyIterator: LegacyAsyncIterator<string> = obj;
+  assert.deepEqual(
+    await XAsyncIterator.from(legacyIterator).toArray(),
+    ['x', 'y']
+  );
+});
+
+//----------
+
+test('Library: prototype methods', async (t) => {
   assert.deepEqual(
     await XAsyncIterator.from(createAsyncIterable()).map(x => x + x).toArray(),
     ['aa', 'bb', 'cc', 'dd']
