@@ -78,8 +78,9 @@ assert.deepEqual(
 
 ### More examples
 
-* [`ts/iterator-helpers-sync_test.ts`](https://github.com/rauschma/iterator-helpers-polyfill/blob/main/ts/iterator-helpers-sync_test.ts)
-* [`ts/iterator-helpers-async_test.ts`](https://github.com/rauschma/iterator-helpers-polyfill/blob/main/ts/iterator-helpers-async_test.ts)
+* [`test/sync_test.ts`](https://github.com/rauschma/iterator-helpers-polyfill/blob/main/test/sync_test.ts)
+* [`test/async_test.ts`](https://github.com/rauschma/iterator-helpers-polyfill/blob/main/test/async_test.ts)
+* [`test/misc_test.ts`](https://github.com/rauschma/iterator-helpers-polyfill/blob/main/test/misc_test.ts)
 
 ## Material on iterator helpers
 
