@@ -2,7 +2,7 @@ import * as assert from 'node:assert/strict';
 import test from 'node:test';
 import '../src/install.js';
 import { XAsyncIterator } from '../src/library-async.js';
-import type { LegacyAsyncIterator, LegacyIterable } from '../src/util.js';
+import type { CoreAsyncIterator, CoreIterable } from '../src/util.js';
 
 //SYNC: type __ValueIdentity__<T> = T;
 
@@ -51,7 +51,7 @@ test('Polyfill: AsyncIterator.from', async (t) => {
       return iterResults[this.count++];
     },
   };
-  const legacyIterator: LegacyAsyncIterator<string> = obj;
+  const legacyIterator: CoreAsyncIterator<string> = obj;
   assert.deepEqual(
     await AsyncIterator.from(legacyIterator).toArray(),
     ['x', 'y']
@@ -154,7 +154,7 @@ test('Library: XAsyncIterator.from', async (t) => {
       return iterResults[this.count++];
     },
   };
-  const legacyIterator: LegacyAsyncIterator<string> = obj;
+  const legacyIterator: CoreAsyncIterator<string> = obj;
   assert.deepEqual(
     await XAsyncIterator.from(legacyIterator).toArray(),
     ['x', 'y']

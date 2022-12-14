@@ -2,7 +2,7 @@ import * as assert from 'node:assert/strict';
 import test from 'node:test';
 import '../src/install.js';
 import { XIterator } from '../src/library-sync.js';
-import type { LegacyIterator, LegacyIterable } from '../src/util.js';
+import type { CoreIterator, CoreIterable } from '../src/util.js';
 
 type __ValueIdentity__<T> = T;
 
@@ -51,7 +51,7 @@ test('Polyfill: Iterator.from', (t) => {
       return iterResults[this.count++];
     },
   };
-  const legacyIterator: LegacyIterator<string> = obj;
+  const legacyIterator: CoreIterator<string> = obj;
   assert.deepEqual(
     Iterator.from(legacyIterator).toArray(),
     ['x', 'y']
@@ -154,7 +154,7 @@ test('Library: XIterator.from', (t) => {
       return iterResults[this.count++];
     },
   };
-  const legacyIterator: LegacyIterator<string> = obj;
+  const legacyIterator: CoreIterator<string> = obj;
   assert.deepEqual(
     XIterator.from(legacyIterator).toArray(),
     ['x', 'y']

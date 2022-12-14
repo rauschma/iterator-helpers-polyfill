@@ -7,7 +7,7 @@ declare global {
   interface AsyncIterator<T, TReturn = any, TNext = undefined> extends IAsyncIterator<T, TReturn, TNext> {}
 
   interface AsyncIteratorConstructor {
-    from<U>(iterableOrIterator: util.LegacyIterable<U> | util.LegacyAsyncIterable<U> | util.LegacyAsyncIterator<U>): AsyncIterator<U>;
+    from<U>(iterableOrIterator: util.CoreIterable<U> | util.CoreAsyncIterable<U> | util.CoreAsyncIterator<U>): AsyncIterator<U>;
     new <T, TReturn = any, TNext = undefined>(): AsyncIterator<T, TReturn, TNext>;
     readonly prototype: AsyncIterator<object>;
   }

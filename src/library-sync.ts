@@ -152,7 +152,7 @@ export abstract class AbstractIterator<T, TReturn = any, TNext = undefined> impl
 //========== Library class ==========
 
 export class XIterator<T> extends AbstractIterator<T> {
-  static from<U>(iterableOrIterator: util.LegacyIterable<U> | util.LegacyIterable<U> | util.LegacyIterator<U>): XIterator<U> {
+  static from<U>(iterableOrIterator: util.CoreIterable<U> | util.CoreIterable<U> | util.CoreIterator<U>): XIterator<U> {
     const iterator = util.GetIteratorFlattenable<Iterator<U>>(iterableOrIterator as unknown as Record<symbol,any>, "sync"); // different quotes for `npm run syncify`
     if (iterator instanceof XIterator) {
       return iterator;
@@ -162,7 +162,7 @@ export class XIterator<T> extends AbstractIterator<T> {
 
   #iterator;
 
-  private constructor(iterator: util.LegacyIterator<T>) {
+  private constructor(iterator: util.CoreIterator<T>) {
     super();
     this.#iterator = iterator;
   }

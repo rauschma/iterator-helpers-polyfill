@@ -152,7 +152,7 @@ export abstract class AbstractAsyncIterator<T, TReturn = any, TNext = undefined>
 //========== Library class ==========
 
 export class XAsyncIterator<T> extends AbstractAsyncIterator<T> {
-  static from<U>(iterableOrIterator: util.LegacyIterable<U> | util.LegacyAsyncIterable<U> | util.LegacyAsyncIterator<U>): XAsyncIterator<U> {
+  static from<U>(iterableOrIterator: util.CoreIterable<U> | util.CoreAsyncIterable<U> | util.CoreAsyncIterator<U>): XAsyncIterator<U> {
     const iterator = util.GetIteratorFlattenable<AsyncIterator<U>>(iterableOrIterator as unknown as Record<symbol,any>, "async"); // different quotes for `npm run syncify`
     if (iterator instanceof XAsyncIterator) {
       return iterator;
@@ -162,7 +162,7 @@ export class XAsyncIterator<T> extends AbstractAsyncIterator<T> {
 
   #iterator;
 
-  private constructor(iterator: util.LegacyAsyncIterator<T>) {
+  private constructor(iterator: util.CoreAsyncIterator<T>) {
     super();
     this.#iterator = iterator;
   }

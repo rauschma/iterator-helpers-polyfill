@@ -80,18 +80,16 @@ function isObject(value: unknown) {
 
 //========== Helper types ==========
 
-export interface LegacyIterable<T> {
-  [Symbol.iterator](): LegacyIterator<T>;
+export interface CoreIterable<T> {
+  [Symbol.iterator](): CoreIterator<T>;
 }
-
-export interface LegacyAsyncIterable<T> {
-  [Symbol.asyncIterator](): LegacyAsyncIterator<T>;
-}
-
-export interface LegacyIterator<T> {
+export interface CoreIterator<T> {
   next(): IteratorResult<T>;
 }
 
-export interface LegacyAsyncIterator<T> {
+export interface CoreAsyncIterable<T> {
+  [Symbol.asyncIterator](): CoreAsyncIterator<T>;
+}
+export interface CoreAsyncIterator<T> {
   next(): Promise<IteratorResult<T>>;
 }
