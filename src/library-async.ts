@@ -13,7 +13,9 @@ export interface IAsyncIterator<T, TReturn = any, TNext = undefined> {
   filter(filterer: (value: T, counter: number) => boolean): AsyncIterator<T>;
   take(limit: number): AsyncIterator<T>;
   drop(limit: number): AsyncIterator<T>;
-  flatMap<U>(mapper: (value: T, counter: number) => Iterable<U>): AsyncIterator<U>;
+  flatMap<U>(
+    mapper: (value: T, counter: number) => Iterable<U> | Iterator<U> | AsyncIterable<U> | AsyncIterator<U>
+  ): AsyncIterator<U>;
   reduce<U>(
     reducer: (accumulator: U, value: T, counter: number) => U,
     initialValue?: U
@@ -40,7 +42,7 @@ export abstract class AbstractAsyncIterator<T, TReturn = any, TNext = undefined>
 
   async * map<U>(mapper: (value: T, counter: number) => U): AsyncIterator<U> {
     let counter = 0;
-    for await (const value of this as unknown as AsyncIterable<T>) {
+    for await (const value of (this as unknown as AsyncIterable<T>)) {
       yield mapper(value, counter);
       counter++;
     }
@@ -48,7 +50,7 @@ export abstract class AbstractAsyncIterator<T, TReturn = any, TNext = undefined>
 
   async * filter(filterer: (value: T, counter: number) => boolean): AsyncIterator<T> {
     let counter = 0;
-    for await (const value of this as unknown as AsyncIterable<T>) {
+    for await (const value of (this as unknown as AsyncIterable<T>)) {
       if (filterer(value, counter)) {
         yield value;
       }
@@ -58,7 +60,7 @@ export abstract class AbstractAsyncIterator<T, TReturn = any, TNext = undefined>
 
   async * take(limit: number): AsyncIterator<T> {
     let counter = 0;
-    for await (const value of this as unknown as AsyncIterable<T>) {
+    for await (const value of (this as unknown as AsyncIterable<T>)) {
       if (counter >= limit) break;
       yield value;
       counter++;
@@ -67,7 +69,7 @@ export abstract class AbstractAsyncIterator<T, TReturn = any, TNext = undefined>
 
   async * drop(limit: number): AsyncIterator<T> {
     let counter = 0;
-    for await (const value of this as unknown as AsyncIterable<T>) {
+    for await (const value of (this as unknown as AsyncIterable<T>)) {
       if (counter >= limit) {
         yield value;
       }
@@ -75,9 +77,11 @@ export abstract class AbstractAsyncIterator<T, TReturn = any, TNext = undefined>
     }
   }
 
-  async * flatMap<U>(mapper: (value: T, counter: number) => Iterable<U>): AsyncIterator<U> {
+  async * flatMap<U>(
+    mapper: (value: T, counter: number) => Iterable<U> | Iterator<U> | AsyncIterable<U> | AsyncIterator<U>
+  ): AsyncIterator<U> {
     let counter = 0;
-    for await (const value of this as unknown as AsyncIterable<T>) {
+    for await (const value of (this as unknown as AsyncIterable<T>)) {
       yield* mapper(value, counter);
       counter++;
     }
@@ -89,7 +93,7 @@ export abstract class AbstractAsyncIterator<T, TReturn = any, TNext = undefined>
   ): Promise<U> {
     let accumulator = initialValue;
     let counter = 0;
-    for await (const value of this as unknown as AsyncIterable<T>) {
+    for await (const value of (this as unknown as AsyncIterable<T>)) {
       if (accumulator === NO_INITIAL_VALUE) {
         accumulator = value as any;
         continue;
@@ -104,21 +108,21 @@ export abstract class AbstractAsyncIterator<T, TReturn = any, TNext = undefined>
   }
   async toArray(): Promise<Array<T>> {
     const result = [];
-    for await (const x of this as unknown as AsyncIterable<T>) {
+    for await (const x of (this as unknown as AsyncIterable<T>)) {
       result.push(x);
     }
     return result;
   }
   async forEach(fn: (value: T, counter: number) => void): Promise<void> {
     let counter = 0;
-    for await (const value of this as unknown as AsyncIterable<T>) {
+    for await (const value of (this as unknown as AsyncIterable<T>)) {
       fn(value, counter);
       counter++;
     }
   }
   async some(fn: (value: T, counter: number) => boolean): Promise<boolean> {
     let counter = 0;
-    for await (const value of this as unknown as AsyncIterable<T>) {
+    for await (const value of (this as unknown as AsyncIterable<T>)) {
       if (fn(value, counter)) {
         return true;
       }
@@ -128,7 +132,7 @@ export abstract class AbstractAsyncIterator<T, TReturn = any, TNext = undefined>
   }
   async every(fn: (value: T, counter: number) => boolean): Promise<boolean> {
     let counter = 0;
-    for await (const value of this as unknown as AsyncIterable<T>) {
+    for await (const value of (this as unknown as AsyncIterable<T>)) {
       if (!fn(value, counter)) {
         return false;
       }
@@ -138,7 +142,7 @@ export abstract class AbstractAsyncIterator<T, TReturn = any, TNext = undefined>
   }
   async find(fn: (value: T, counter: number) => boolean): Promise<undefined | T> {
     let counter = 0;
-    for await (const value of this as unknown as AsyncIterable<T>) {
+    for await (const value of (this as unknown as AsyncIterable<T>)) {
       if (fn(value, counter)) {
         return value;
       }
@@ -152,7 +156,9 @@ export abstract class AbstractAsyncIterator<T, TReturn = any, TNext = undefined>
 //========== Library class ==========
 
 export class XAsyncIterator<T> extends AbstractAsyncIterator<T> {
-  static from<U>(iterableOrIterator: util.CoreIterable<U> | util.CoreAsyncIterable<U> | util.CoreAsyncIterator<U>): XAsyncIterator<U> {
+  static from<U>(
+    iterableOrIterator: util.CoreIterable<U> | util.CoreIterator<U> | util.CoreAsyncIterable<U> | util.CoreAsyncIterator<U>
+  ): XAsyncIterator<U> {
     const iterator = util.GetIteratorFlattenable<AsyncIterator<U>>(iterableOrIterator as unknown as Record<symbol,any>, "async"); // different quotes for `npm run syncify`
     if (iterator instanceof XAsyncIterator) {
       return iterator;
@@ -194,7 +200,9 @@ export class XAsyncIterator<T> extends AbstractAsyncIterator<T> {
     return XAsyncIterator.from(super.drop(limit));
   }
 
-  override flatMap<U>(mapper: (value: T, counter: number) => Iterable<U>): XAsyncIterator<U> {
+  override flatMap<U>(
+    mapper: (value: T, counter: number) => Iterable<U> | Iterator<U> | AsyncIterable<U> | AsyncIterator<U>
+  ): XAsyncIterator<U> {
     return XAsyncIterator.from(super.flatMap(mapper));
   }
 

@@ -39,6 +39,11 @@ Object.setPrototypeOf(AsyncFromSyncIterator.prototype, AsyncIteratorPrototype)
 
 //========== getIterator ==========
 
+/**
+ * This function can only distinguish between sync iterables and async iterables.
+ * However, returning sync iterators as async iterators is OK: .next() does not
+ * return Promises but awaiting non-Promises works.
+ */
 export function GetIteratorFlattenable<T>(obj: Record<symbol,any>, hint: 'sync' | 'async'): T {
   if (!isObject(obj)) {
     throw new TypeError();

@@ -13,7 +13,9 @@ export interface IIterator<T, TReturn = any, TNext = undefined> {
   filter(filterer: (value: T, counter: number) => boolean): Iterator<T>;
   take(limit: number): Iterator<T>;
   drop(limit: number): Iterator<T>;
-  flatMap<U>(mapper: (value: T, counter: number) => Iterable<U>): Iterator<U>;
+  flatMap<U>(
+    mapper: (value: T, counter: number) => Iterable<U> | Iterator<U> | Iterable<U> | Iterator<U>
+  ): Iterator<U>;
   reduce<U>(
     reducer: (accumulator: U, value: T, counter: number) => U,
     initialValue?: U
@@ -40,7 +42,7 @@ export abstract class AbstractIterator<T, TReturn = any, TNext = undefined> impl
 
   * map<U>(mapper: (value: T, counter: number) => U): Iterator<U> {
     let counter = 0;
-    for (const value of this as unknown as Iterable<T>) {
+    for (const value of (this as unknown as Iterable<T>)) {
       yield mapper(value, counter);
       counter++;
     }
@@ -48,7 +50,7 @@ export abstract class AbstractIterator<T, TReturn = any, TNext = undefined> impl
 
   * filter(filterer: (value: T, counter: number) => boolean): Iterator<T> {
     let counter = 0;
-    for (const value of this as unknown as Iterable<T>) {
+    for (const value of (this as unknown as Iterable<T>)) {
       if (filterer(value, counter)) {
         yield value;
       }
@@ -58,7 +60,7 @@ export abstract class AbstractIterator<T, TReturn = any, TNext = undefined> impl
 
   * take(limit: number): Iterator<T> {
     let counter = 0;
-    for (const value of this as unknown as Iterable<T>) {
+    for (const value of (this as unknown as Iterable<T>)) {
       if (counter >= limit) break;
       yield value;
       counter++;
@@ -67,7 +69,7 @@ export abstract class AbstractIterator<T, TReturn = any, TNext = undefined> impl
 
   * drop(limit: number): Iterator<T> {
     let counter = 0;
-    for (const value of this as unknown as Iterable<T>) {
+    for (const value of (this as unknown as Iterable<T>)) {
       if (counter >= limit) {
         yield value;
       }
@@ -75,9 +77,11 @@ export abstract class AbstractIterator<T, TReturn = any, TNext = undefined> impl
     }
   }
 
-  * flatMap<U>(mapper: (value: T, counter: number) => Iterable<U>): Iterator<U> {
+  * flatMap<U>(
+    mapper: (value: T, counter: number) => Iterable<U> | Iterator<U> | Iterable<U> | Iterator<U>
+  ): Iterator<U> {
     let counter = 0;
-    for (const value of this as unknown as Iterable<T>) {
+    for (const value of (this as unknown as Iterable<T>)) {
       yield* mapper(value, counter);
       counter++;
     }
@@ -89,7 +93,7 @@ export abstract class AbstractIterator<T, TReturn = any, TNext = undefined> impl
   ): __ValueIdentity__<U> {
     let accumulator = initialValue;
     let counter = 0;
-    for (const value of this as unknown as Iterable<T>) {
+    for (const value of (this as unknown as Iterable<T>)) {
       if (accumulator === NO_INITIAL_VALUE) {
         accumulator = value as any;
         continue;
@@ -104,21 +108,21 @@ export abstract class AbstractIterator<T, TReturn = any, TNext = undefined> impl
   }
   toArray(): __ValueIdentity__<Array<T>> {
     const result = [];
-    for (const x of this as unknown as Iterable<T>) {
+    for (const x of (this as unknown as Iterable<T>)) {
       result.push(x);
     }
     return result;
   }
   forEach(fn: (value: T, counter: number) => void): __ValueIdentity__<void> {
     let counter = 0;
-    for (const value of this as unknown as Iterable<T>) {
+    for (const value of (this as unknown as Iterable<T>)) {
       fn(value, counter);
       counter++;
     }
   }
   some(fn: (value: T, counter: number) => boolean): __ValueIdentity__<boolean> {
     let counter = 0;
-    for (const value of this as unknown as Iterable<T>) {
+    for (const value of (this as unknown as Iterable<T>)) {
       if (fn(value, counter)) {
         return true;
       }
@@ -128,7 +132,7 @@ export abstract class AbstractIterator<T, TReturn = any, TNext = undefined> impl
   }
   every(fn: (value: T, counter: number) => boolean): __ValueIdentity__<boolean> {
     let counter = 0;
-    for (const value of this as unknown as Iterable<T>) {
+    for (const value of (this as unknown as Iterable<T>)) {
       if (!fn(value, counter)) {
         return false;
       }
@@ -138,7 +142,7 @@ export abstract class AbstractIterator<T, TReturn = any, TNext = undefined> impl
   }
   find(fn: (value: T, counter: number) => boolean): __ValueIdentity__<undefined | T> {
     let counter = 0;
-    for (const value of this as unknown as Iterable<T>) {
+    for (const value of (this as unknown as Iterable<T>)) {
       if (fn(value, counter)) {
         return value;
       }
@@ -152,7 +156,9 @@ export abstract class AbstractIterator<T, TReturn = any, TNext = undefined> impl
 //========== Library class ==========
 
 export class XIterator<T> extends AbstractIterator<T> {
-  static from<U>(iterableOrIterator: util.CoreIterable<U> | util.CoreIterable<U> | util.CoreIterator<U>): XIterator<U> {
+  static from<U>(
+    iterableOrIterator: util.CoreIterable<U> | util.CoreIterator<U> | util.CoreIterable<U> | util.CoreIterator<U>
+  ): XIterator<U> {
     const iterator = util.GetIteratorFlattenable<Iterator<U>>(iterableOrIterator as unknown as Record<symbol,any>, "sync"); // different quotes for `npm run syncify`
     if (iterator instanceof XIterator) {
       return iterator;
@@ -194,7 +200,9 @@ export class XIterator<T> extends AbstractIterator<T> {
     return XIterator.from(super.drop(limit));
   }
 
-  override flatMap<U>(mapper: (value: T, counter: number) => Iterable<U>): XIterator<U> {
+  override flatMap<U>(
+    mapper: (value: T, counter: number) => Iterable<U> | Iterator<U> | Iterable<U> | Iterator<U>
+  ): XIterator<U> {
     return XIterator.from(super.flatMap(mapper));
   }
 

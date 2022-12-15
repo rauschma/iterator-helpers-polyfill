@@ -1,5 +1,7 @@
 # Iterator helpers polyfill
 
+A polyfill for [the ECMAScript proposal “Iterator Helpers”](https://github.com/tc39/proposal-iterator-helpers) ([documentation for this proposal](https://2ality.com/2022/12/iterator-helpers.html)).
+
 ## Warning
 
 **Don’t trust this code:**
@@ -84,5 +86,5 @@ assert.deepEqual(
 
 ## Material on iterator helpers
 
-* ECMAScript proposal: https://github.com/tc39/proposal-iterator-helpers
+* ECMAScript proposal “Iterator Helpers”: https://github.com/tc39/proposal-iterator-helpers
 * Blog post: https://2ality.com/2022/12/iterator-helpers.html

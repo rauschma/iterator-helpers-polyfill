@@ -7,7 +7,9 @@ declare global {
   interface Iterator<T, TReturn = any, TNext = undefined> extends IIterator<T, TReturn, TNext> {}
 
   interface IteratorConstructor {
-    from<U>(iterableOrIterator: util.CoreIterable<U> | util.CoreIterable<U> | util.CoreIterator<U>): Iterator<U>;
+    from<U>(
+      iterableOrIterator: util.CoreIterable<U> | util.CoreIterator<U> | util.CoreIterable<U> | util.CoreIterator<U>
+    ): Iterator<U>;
     new <T, TReturn = any, TNext = undefined>(): Iterator<T, TReturn, TNext>;
     readonly prototype: Iterator<object>;
   }

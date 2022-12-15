@@ -1,7 +1,7 @@
 {
   "name": "@rauschma/iterator-helpers-polyfill",
   "description": "A polyfill for the ECMAScript proposal “Iterator Helpers”",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "author": "Axel Rauschmayer",
   "keywords": [
     "javascript",
@@ -31,6 +31,11 @@
     "build": "tsc",
     "watch": "tsc --watch",
     "clean": "shx rm -rf ./dist"
+  },
+  "// devDependencies": {
+    "@types/node": "needed for the unit tests (which use Node’s built-in test runner)",
+    "shx": "used by the scripts",
+    "typescript": "needed for `npm publish`"
   },
   "devDependencies": {
     "@types/node": "^18.11.12",

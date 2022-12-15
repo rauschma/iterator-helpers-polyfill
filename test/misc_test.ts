@@ -6,21 +6,7 @@ import '../src/install.js';
 import { XAsyncIterator } from '../src/library-async.js';
 import { XIterator } from '../src/library-sync.js';
 
-//========== Sync ==========
-
-test('Polyfill: toAsync', (t) => {
-  assert.ok(
-    ['a', 'b', 'c'].values().toAsync() instanceof AsyncIterator
-  );
-});
-
-test('Library: toAsync', (t) => {
-  assert.ok(
-    XIterator.from(['a', 'b', 'c']).toAsync() instanceof XAsyncIterator
-  );
-});
-
-//========== Async ==========
+//========== Polyfill ==========
 
 test('Polyfill: AsyncIterator.from(syncIterable)', async (t) => {
   const syncIterable = ['x', 'y']
@@ -30,6 +16,22 @@ test('Polyfill: AsyncIterator.from(syncIterable)', async (t) => {
   );
 });
 
+test('Polyfill: toAsync', (t) => {
+  assert.ok(
+    ['a', 'b', 'c'].values().toAsync() instanceof AsyncIterator
+  );
+});
+
+test('Polyfill: flatMap', async (t) => {
+  assert.deepEqual(
+    await createAsyncIterator()
+    .flatMap(x => createAsyncIterator()).toArray(),
+    ['a','b','c', 'a','b','c', 'a','b','c']
+  );
+});
+
+//========== Library ==========
+
 test('Library: XAsyncIterator.from(syncIterable)', async (t) => {
   const syncIterable = ['x', 'y'];
   assert.deepEqual(
@@ -37,3 +39,23 @@ test('Library: XAsyncIterator.from(syncIterable)', async (t) => {
     ['x', 'y']
   );
 });
+
+test('Library: toAsync', (t) => {
+  assert.ok(
+    XIterator.from(['a', 'b', 'c']).toAsync() instanceof XAsyncIterator
+  );
+});
+
+test('Polyfill: flatMap', async (t) => {
+  assert.deepEqual(
+    await XAsyncIterator.from(createAsyncIterator())
+    .flatMap(x => createAsyncIterator()).toArray(),
+    ['a','b','c', 'a','b','c', 'a','b','c']
+  );
+});
+
+//========== Helpers ==========
+
+async function* createAsyncIterator() {
+  yield 'a'; yield 'b'; yield 'c';
+}
