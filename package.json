@@ -9,6 +9,7 @@
     "iteration",
     "iterator"
   ],
+  "types": "./dist/src/library.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rauschma/iterator-helpers-polyfill.git"
